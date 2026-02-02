@@ -1,12 +1,47 @@
+from flask import Blueprint, render_template, request, redirect, flash, url_for
+from flask_login import login_required, current_user
+import random
 import string
-from flask import Blueprint, render_template, request, redirect, flash
 from app import db
-from app.models import Link
 
 bp = Blueprint('main', __name__)
 
 # Pool for available character like IPs in DHCP Pool
 CHAR_POOL = string.digits + string.ascii_lowercase + string.ascii_uppercase
+
+# ===== DASHBAORD ROUTE ======
+@bp.route('/dashboard', methods = ['GET', 'POST'])
+@login_required
+def dashboard():
+    short_url = None
+
+    if request.method == 'POST':
+        original_url = request.form.get('url')
+        if not original_url:
+            flash('URL is required', 'error')
+            return redirect(url_for('main.dashboard'))
+        
+        #generate random short_code
+        short_code = ''.join(random.choice(CHAR_POOL) for _ in range(3))
+
+        #ensure unique short_code
+        while Link.query.filter_by(short_code=short_code).first():
+            short_code = ''.join(random.choice(CHAR_POOL) for _ in range(3))
+
+        #save link with current user
+        try:
+            link = Link(short_code=short_code, original_url=original_url, user_id=current_user.id)
+            db.session.add(link)
+            db.session.commit()
+            flash(f"Short Code created: {short_code}", 'success')
+            return redirect(url_for('main.dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash("Error saving URL", 'error')
+            
+    links = Link.query.filter_by(user_id=current_user.id).order_by(Link.created_at.desc()).all()
+    return render_template('dashbaord.html', links=links)
+
 
 @bp.route('/', methods=['GET', 'POST'])
 def home():
@@ -48,7 +83,8 @@ def redirect_to_url(short_code):
     if link:
         # if found, then redirect to original_orl
         # Link.times_visited += 1
-
+        link.clicks +=1
+        db.session.commit()
         return redirect(link.original_url)
     
     #if not, then don't exist

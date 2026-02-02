@@ -56,6 +56,7 @@ def signup():
             flash('Signup successful! Please login.', 'success')
 
         except Exception as e:
+            db.session.rollback()
             logging.error(f"Failed to initialize database: {e}")
     
     return render_template('signup.html')
