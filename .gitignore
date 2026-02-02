@@ -1,20 +1,15 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.sqlite3
 
 # Virtual environment
 venv/
-env/
 
 # Environment variables
 .env
+.flaskenv
 
 # Flask
 instance/
-.webassets-cache
 
 # Migrations cache
 migrations/__pycache__/
