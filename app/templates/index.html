@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-700 text-center">Shorten a Long URL</h2>
+    
+    <form action="/" method="POST" class="space-y-4">
+        <div>
+            <label for="url" class="block text-sm font-medium text-gray-600">Paste your long link here:</label>
+            <input type="url" name="url" id="url" required 
+                   placeholder="https://example.com/very/long/path"
+                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        
+        <button type="submit" 
+                class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+            Shorten!
+        </button>
+    </form>
+
+    {% if short_url %}
+    <div class="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg text-center">
+        <p class="text-gray-600 mb-2">Your shortened link is:</p>
+        
+        <div class="flex items-center justify-center space-x-2">
+            <input type="text" id="shortUrlText" readonly 
+                   value="{{ request.host_url }}{{ short_url }}" 
+                   class="text-xl font-mono font-bold text-blue-700 bg-transparent border-none focus:ring-0 text-center">
+            
+            <button onclick="copyToClipboard()" 
+                    id="copyBtn"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition flex items-center">
+                <span>Copy</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+    function copyToClipboard() {
+        const copyText = document.getElementById("shortUrlText");
+        const btn = document.getElementById("copyBtn");
+
+        // Use the modern Clipboard API
+        navigator.clipboard.writeText(copyText.value).then(() => {
+            // Visual feedback: Change button text temporarily
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "<span>Copied!</span>";
+            btn.classList.replace('bg-blue-600', 'bg-green-600');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.replace('bg-green-600', 'bg-blue-600');
+            }, 2000);
+        }).catch(err => {
+            console.error('Error copying text: ', err);
+        });
+    }
+    </script>
+    {% endif %}
+</div>
+{% endblock %}
