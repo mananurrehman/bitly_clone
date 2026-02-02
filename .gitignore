@@ -1,6 +1,10 @@
 # Python
 __pycache__/
 
+#pycache from app
+app/__pycache__/
+*.pyc
+
 # Virtual environment
 venv/
 
