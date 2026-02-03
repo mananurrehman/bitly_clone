@@ -94,3 +94,20 @@ def redirect_to_url(short_code):
     #if not, then don't exist
     flash("Sorry, that short link doesn't exist!", "error")
     return redirect('/')
+
+# ==> Deleting short url and free the 3 char phrase against it
+
+@bp.route('/delete/<int:id>', methods = ['POST'])
+@login_required
+def delete_link(id):
+    from app.models import Link
+    link = Link.query.get_or_404(id)
+
+    try:
+        db.session.delete(link)
+        db.session.commit()
+        flash(f'Shrot URL Deleted & Short Code freed!', 'success')
+    except:
+        db.session.rollback()
+        flash(f'Unable to delete short url', 'error')
+    return redirect(url_for('main.dashboard'))
