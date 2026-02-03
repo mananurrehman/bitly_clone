@@ -3,6 +3,7 @@ from app.models import User
 from app import db
 from flask_login import login_user, logout_user, login_required
 import logging
+from flask_login import current_user
 
 auth = Blueprint('auth', __name__)
 
@@ -28,6 +29,9 @@ def login():
         else:
             flash("Invalid email or password", "eror")
             return redirect(url_for('auth.login'))
+    
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
         
     return render_template('login.html')
 
@@ -58,6 +62,9 @@ def signup():
         except Exception as e:
             db.session.rollback()
             logging.error(f"Failed to initialize database: {e}")
+    
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
     
     return render_template('signup.html')
 
