@@ -9,8 +9,8 @@ bp = Blueprint('main', __name__)
 # Pool for available character like IPs in DHCP Pool
 CHAR_POOL = string.digits + string.ascii_lowercase + string.ascii_uppercase
 
-# ===== DASHBAORD ROUTE ======
-@bp.route('/dashboard', methods = ['GET', 'POST'])
+# ===== DASHBOARD ROUTE ======
+@bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     from app.models import Link
@@ -18,63 +18,74 @@ def dashboard():
 
     if request.method == 'POST':
         original_url = request.form.get('url')
+        edit_id = request.form.get('edit_id')
+
         if not original_url:
             flash('URL is required', 'error')
             return redirect(url_for('main.dashboard'))
-        
-        #generate random short_code
+
+        # ========= UPDATE MODE (ALREADY EXISTING) =========
+        if edit_id:
+            try:
+                link = Link.query.get_or_404(edit_id)
+
+                link.original_url = original_url
+                link.clicks = 0   # reset clicks on update
+
+                db.session.commit()
+                flash("Short link updated successfully!", "success")
+                return redirect(url_for('main.dashboard'))
+
+            except Exception as e:
+                db.session.rollback()
+                flash("Error updating URL", "error")
+                return redirect(url_for('main.dashboard'))
+
+        # ========= CREATE MODE (NEW) =========
+
+        # generate random short_code
         short_code = ''.join(random.choice(CHAR_POOL) for _ in range(3))
 
-        #ensure unique short_code
+        # ensure unique short_code
         while Link.query.filter_by(short_code=short_code).first():
             short_code = ''.join(random.choice(CHAR_POOL) for _ in range(3))
 
-        #save link with current user
         try:
-            link = Link(short_code=short_code, original_url=original_url, user_id=current_user.id)
+            link = Link(
+                short_code=short_code,
+                original_url=original_url,
+                user_id=current_user.id,
+                clicks=0
+            )
+
             db.session.add(link)
             db.session.commit()
-            short_url = url_for("main.redirect_to_url", short_code=short_code, _external=True) #new code added
+
+            short_url = url_for(
+                "main.redirect_to_url",
+                short_code=short_code,
+                _external=True
+            )
+
             flash(f"Short link created: {short_url}", 'success')
             return redirect(url_for('main.dashboard'))
+
         except Exception as e:
             db.session.rollback()
             flash("Error saving URL", 'error')
-            
-    links = Link.query.filter_by(user_id=current_user.id).order_by(Link.created_at.desc()).all()
+            return redirect(url_for('main.dashboard'))
+
+    links = (
+        Link.query
+        .filter_by(user_id=current_user.id)
+        .order_by(Link.created_at.desc())
+        .all()
+    )
+
     return render_template('dashboard.html', links=links)
 
 
-# @bp.route('/', methods=['GET', 'POST'])
-# def home():
-#     from models import Link
-#     short_url = None
-
-#     if request.method == 'POST':
-#         original_url = request.form.get('url')
-
-#         if not original_url:
-#             flash("URL is required!", "error")
-#             return redirect('/')
-
-#         # generate 3-char short code (temporary simple version)
-#         import random
-#         short_code = ''.join(random.choice(CHAR_POOL) for _ in range(3))
-
-#         try:
-#             link = Link(short_code=short_code, original_url=original_url)
-#             db.session.add(link)
-#             db.session.commit()
-#             short_url = short_code
-
-#         except Exception as e:
-#             db.session.rollback()
-#             flash("Something went wrong while saving URL", "error")
-
-#     return render_template('index.html', short_url=short_url)
-
-
-# ===> Redirect Logic
+# ===> REDIRECT LOGIC - short_url (generated) <=====
 
 @bp.route('/<short_code>')
 def redirect_to_url(short_code):
