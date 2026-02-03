@@ -11,7 +11,7 @@
         <div class="container mx-auto flex justify-between items-center">
           <a href="{% if current_user.is_authenticated %}{{ url_for('main.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}"
             class="text-2xl font-bold text-blue-600">
-              Bitly<span class="text-gray-800">1Char</span>
+              Bitly<span class="text-gray-800">3Char</span>
           </a>
 
             {% if current_user.is_authenticated %}

@@ -28,11 +28,15 @@
             <tr>
                 <td class="border px-4 py-2">{{ loop.index }}</td>
                 <td class="border px-4 py-2">
-                    <a href="{{ url_for('main.redirect_to_url', short_code=link.short_code) }}" class="text-blue-600 hover:underline">
+                    <a href="{{ url_for('main.redirect_to_url', short_code=link.short_code) }}" class="text-blue-600 hover:underline" target="_blank">
                         {{ link.short_code }}
                     </a>
                 </td>
-                <td class="border px-4 py-2">{{ link.original_url }}</td>
+                <td class="border px-4 py-2">
+                    <a href="{{ link.original_url }}" target="_blank" class="text-blue-600 hover:underline">
+                        {{ link.original_url }}
+                    </a>
+                </td>
                 <td class="border px-4 py-2">{{ link.clicks }}</td>
             </tr>
             {% endfor %}
