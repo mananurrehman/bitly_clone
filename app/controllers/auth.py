@@ -58,6 +58,7 @@ def signup():
             db.session.add(new_user)
             db.session.commit()
             flash('Signup successful! Please login.', 'success')
+            return redirect(url_for('auth.login'))
 
         except Exception as e:
             db.session.rollback()
