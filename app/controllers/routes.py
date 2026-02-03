@@ -13,6 +13,7 @@ CHAR_POOL = string.digits + string.ascii_lowercase + string.ascii_uppercase
 @bp.route('/dashboard', methods = ['GET', 'POST'])
 @login_required
 def dashboard():
+    from app.models import Link
     short_url = None
 
     if request.method == 'POST':
@@ -43,38 +44,40 @@ def dashboard():
     return render_template('dashbaord.html', links=links)
 
 
-@bp.route('/', methods=['GET', 'POST'])
-def home():
-    short_url = None
+# @bp.route('/', methods=['GET', 'POST'])
+# def home():
+#     from models import Link
+#     short_url = None
 
-    if request.method == 'POST':
-        original_url = request.form.get('url')
+#     if request.method == 'POST':
+#         original_url = request.form.get('url')
 
-        if not original_url:
-            flash("URL is required!", "error")
-            return redirect('/')
+#         if not original_url:
+#             flash("URL is required!", "error")
+#             return redirect('/')
 
-        # generate 3-char short code (temporary simple version)
-        import random
-        short_code = ''.join(random.choice(CHAR_POOL) for _ in range(3))
+#         # generate 3-char short code (temporary simple version)
+#         import random
+#         short_code = ''.join(random.choice(CHAR_POOL) for _ in range(3))
 
-        try:
-            link = Link(short_code=short_code, original_url=original_url)
-            db.session.add(link)
-            db.session.commit()
-            short_url = short_code
+#         try:
+#             link = Link(short_code=short_code, original_url=original_url)
+#             db.session.add(link)
+#             db.session.commit()
+#             short_url = short_code
 
-        except Exception as e:
-            db.session.rollback()
-            flash("Something went wrong while saving URL", "error")
+#         except Exception as e:
+#             db.session.rollback()
+#             flash("Something went wrong while saving URL", "error")
 
-    return render_template('index.html', short_url=short_url)
+#     return render_template('index.html', short_url=short_url)
 
 
 # ===> Redirect Logic
 
 @bp.route('/<short_code>')
 def redirect_to_url(short_code):
+    from models import Link
     # Search the database for this specific 1-char code
     # .first() bcz 'short_code'=unique
 

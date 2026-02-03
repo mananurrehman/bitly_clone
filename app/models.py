@@ -25,18 +25,18 @@ class User(db.Model, UserMixin):
     
     # Link Model based on datetime
 
-    class Link(db.Model):
-        __tablename__ = 'links'
+class Link(db.Model):
+    __tablename__ = 'links'
 
-        id = db.Column(db.Integer, primary_key=True)
-        original_url = db.Column(db.Text, nullable=False)
-        short_code = db.Column(db.String(10), unique=True, nullable=False)
-        clicks = db.Column(db.Integer, default=0)
+    id = db.Column(db.Integer, primary_key=True)
+    original_url = db.Column(db.Text, nullable=False)
+    short_code = db.Column(db.String(10), unique=True, nullable=False)
+    clicks = db.Column(db.Integer, default=0)
 
-        user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-        created_at = db.Column(db.DateTime, default=datetime.utcnow)
-        user = db.relationship('User', backref='links')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user = db.relationship('User', backref='links')
 
-        def __repr__(self):
-            return f'<Link {self.short_code}>'
+    def __repr__(self):
+        return f'<Link {self.short_code}>'
