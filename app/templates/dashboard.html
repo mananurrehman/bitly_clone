@@ -24,9 +24,9 @@
             </tr>
         </thead>
         <tbody>
-            {% for idx, link in enumerate(links, start=1) %}
+            {% for link in links %}
             <tr>
-                <td class="border px-4 py-2">{{ idx }}</td>
+                <td class="border px-4 py-2">{{ loop.index }}</td>
                 <td class="border px-4 py-2">
                     <a href="{{ url_for('main.redirect_to_url', short_code=link.short_code) }}" class="text-blue-600 hover:underline">
                         {{ link.short_code }}

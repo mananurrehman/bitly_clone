@@ -34,14 +34,15 @@ def dashboard():
             link = Link(short_code=short_code, original_url=original_url, user_id=current_user.id)
             db.session.add(link)
             db.session.commit()
-            flash(f"Short Code created: {short_code}", 'success')
+            short_url = url_for("main.redirect_to_url", short_code=short_code, _external=True) #new code added
+            flash(f"Short link created: {short_url}", 'success')
             return redirect(url_for('main.dashboard'))
         except Exception as e:
             db.session.rollback()
             flash("Error saving URL", 'error')
             
     links = Link.query.filter_by(user_id=current_user.id).order_by(Link.created_at.desc()).all()
-    return render_template('dashbaord.html', links=links)
+    return render_template('dashboard.html', links=links)
 
 
 # @bp.route('/', methods=['GET', 'POST'])
@@ -77,7 +78,7 @@ def dashboard():
 
 @bp.route('/<short_code>')
 def redirect_to_url(short_code):
-    from models import Link
+    from app.models import Link
     # Search the database for this specific 1-char code
     # .first() bcz 'short_code'=unique
 
