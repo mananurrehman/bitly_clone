@@ -11,6 +11,10 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
 
     password_hash = db.Column(db.String(225), nullable=False)
+    
+    # Role assignment (user/admin)
+    role = db.Column(db.String(20), default='user')
+
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -20,8 +24,12 @@ class User(db.Model, UserMixin):
     def check_password(self, passowrd):
         return check_password_hash(self.password_hash, passowrd)
     
+    #Role Checking (is_admin): 
+    def is_admin(self):
+        return self.role == 'admin'
+    
     def __repr__(self):
-        return f'<User {self.email}>'
+        return f'<User {self.email} - {self.role}>'
     
     # Link Model based on datetime
 

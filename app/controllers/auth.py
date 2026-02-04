@@ -24,15 +24,18 @@ def login():
         
         if user and user.check_password(password):
             login_user(user)
-            return redirect(url_for('main.dashboard'))
+
+            # role based redirection
+            if user.role == 'admin':
+                return redirect(url_for('main.admin_dashboard'))
+            elif user.role == 'org_owner':
+                return redirect(url_for('main.org_dashboard'))
+            else:
+                return redirect(url_for('main.dashboard'))
         
-        else:
-            flash("Invalid email or password", "eror")
-            return redirect(url_for('auth.login'))
+        flash("Invalid email or password", 'error')
+        return redirect(url_for('auth.login'))
     
-    if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
-        
     return render_template('login.html')
 
 # Sign up route
