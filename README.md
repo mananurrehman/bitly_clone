@@ -57,11 +57,16 @@ bitly_clone/
 │
 ├── app/
 │   ├── controllers/
+│   │   ├── __init__.py      # App factory (controllers)
+│   │   ├── admin.py         # Admin routes
 │   │   ├── auth.py          # Authentication routes
 │   │   └── routes.py        # Dashboard & redirect routes
 │   │
 │   ├── templates/
+│   │   ├── admin_dashboard.html
+│   │   ├── admin_user_links.html
 │   │   ├── base.html
+│   │   ├── index.html
 │   │   ├── login.html
 │   │   ├── signup.html
 │   │   └── dashboard.html
@@ -72,7 +77,7 @@ bitly_clone/
 ├── migrations/              # Alembic migrations
 ├── config.py                # App configuration
 ├── run.py                   # Entry point
-├── requirements.txt
+├── requirements.txt         # Project requirements
 ├── .gitignore
 └── README.md
 ```
