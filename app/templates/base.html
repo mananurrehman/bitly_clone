@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans leading-normal tracking-normal transition-colors duration-300">
     <nav class="bg-white p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
           <a href="{% if current_user.is_authenticated %}{{ url_for('main.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}"
@@ -16,24 +16,65 @@
               Bitly<span class="text-gray-800">3Char</span>
           </a>
           
-            {% if current_user.is_authenticated %}
-                
-                <div class="flex items-center gap-2"> 
-                  {% if current_user.is_admin %}
-                        <a href="{{ url_for('admin.admin_user_links') }}"
-                          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-medium">
-                          View All Users
-                        </a>
-                  {% endif %}
+          {% if current_user.is_authenticated %}                
+              <div class="flex items-center gap-2"> 
+                  <!-- Profile Avatar with Dropdown -->
+                  <div class="relative">
+                      <!-- Avatar button -->
+                      <button id="profileBtn" class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-bold focus:outline-none hover:ring-2 hover:ring-blue-400">
+                          {{ current_user.email[0]|upper }}
+                      </button>
 
-                    <a href="{{ url_for('auth.logout') }}"
-                      class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-medium">
-                      Logout
-                    </a>
-                    
-                </div>
+                      <!-- Dropdown -->
+                      <div id="profileDropdown" class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden z-50 dark:bg-gray-800 transition-all duration-200">
+                          <div class="py-2 flex flex-col text-sm text-gray-700 dark:text-gray-200">
 
-            {% endif %}
+                              <!-- Email -->
+                              <div class="px-4 py-2 truncate text-gray-800 dark:text-gray-200">
+                                  {{ current_user.email }}
+                              </div>
+
+                              <hr class="border-gray-200 dark:border-gray-700 my-1">
+
+                              <!-- Admin: View All Users -->
+                              {% if current_user.is_admin %}
+                              <a href="{{ url_for('admin.admin_user_links') }}"
+                                class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium text-indigo-600 hover:text-indigo-800">
+                                  <i class="fa-solid fa-users"></i>
+                                  View All Users
+                              </a>
+                              <hr class="border-gray-200 dark:border-gray-700 my-1">
+                              {% endif %}
+
+                              <!-- Profile Link -->
+                              <a href="#" 
+                                class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium">
+                                  <i class="fa-solid fa-user text-gray-600 dark:text-gray-300"></i>
+                                  Profile
+                              </a>
+
+                              <!-- Settings Link -->
+                              <a href="#" 
+                                class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium">
+                                  <i class="fa-solid fa-gear text-gray-600 dark:text-gray-300"></i>
+                                  Settings
+                              </a>
+
+                              <hr class="border-gray-200 dark:border-gray-700 my-1">
+
+                              <!-- Logout Link -->
+                              <a href="{{ url_for('auth.logout') }}"
+                                class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium text-red-600 hover:text-red-800">
+                                  <i class="fa-solid fa-right-from-bracket"></i>
+                                  Logout
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+                  <!-- End of Profile Dropdown -->
+
+              </div>
+          {% endif %}
         </div>
     </nav>
 
@@ -50,6 +91,28 @@
 
         {% block content %}{% endblock %}
     </main>
+
+<script>
+/* =============================
+   PROFILE DROPDOWN TOGGLE LOGIC
+   ============================= */
+const profileBtn = document.getElementById('profileBtn');
+const profileDropdown = document.getElementById('profileDropdown');
+
+if (profileBtn && profileDropdown) {
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevent immediate close
+        profileDropdown.classList.toggle('hidden');
+    });
+
+    // Close dropdown if clicked outside
+    window.addEventListener('click', () => {
+        if (!profileDropdown.classList.contains('hidden')) {
+            profileDropdown.classList.add('hidden');
+        }
+    });
+}
+</script>
 
 </body>
 </html>
