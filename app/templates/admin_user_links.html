@@ -10,23 +10,22 @@
 
     <!-- User Selection Dropdown -->
     <div class="mb-6 flex justify-center">
-        <form method="GET" action="{{ url_for('main.admin_users_links') }}">
-            <select name="user_id"
-                    onchange="this.form.submit()"
-                    class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <form method="GET" action="{{ url_for('admin.admin_user_links') }}">
+
+            <select name="user_id" onchange="this.form.submit()"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="">Select user</option>
-                {% for user in users %}
-                    <option value="{{ user.id }}" 
-                        {% if selected_user_id and selected_user_id|int == user.id %}selected{% endif %}>
-                        {{ user.email }}
-                    </option>
+                {% for user in all_users %}
+                <option value="{{ user.id }}" {% if select_user_id|int==user.id %} selected {% endif %}>
+                    {{ user.email }} ({{user.role}})
+                </option>
                 {% endfor %}
             </select>
         </form>
     </div>
 
     <!-- Links Table (only visible if a user is selected) -->
-    {% if links %}
+
     <div class="overflow-x-auto bg-white rounded-lg shadow p-4">
         <table class="min-w-full border">
             <thead>
@@ -34,25 +33,25 @@
                     <th class="border px-4 py-2">Sr. #</th>
                     <th class="border px-4 py-2">Short URL</th>
                     <th class="border px-4 py-2">Original URL</th>
+                    <th class="border px-4 py-2">User</th>
                     <th class="border px-4 py-2">Click Count</th>
                     <th class="border px-4 py-2">Action</th>
                 </tr>
             </thead>
             <tbody>
-                {% for link in links %}
+                {%for user in users %}
+
+                {% for link in user.links %}
                 <tr class="hover:bg-gray-50">
                     <td class="border px-4 py-2">{{ loop.index }}</td>
 
                     <!-- Short URL with copy button -->
                     <td class="border px-4 py-2 flex items-center justify-between min-w-[150px]">
                         <a href="{{ url_for('main.redirect_to_url', short_code=link.short_code) }}"
-                           class="text-blue-600 hover:underline truncate flex-1"
-                           target="_blank">
+                            class="text-blue-600 hover:underline truncate flex-1" target="_blank">
                             {{ request.host_url }}{{ link.short_code }}
                         </a>
-                        <button
-                            data-url="{{ request.host_url }}{{ link.short_code }}"
-                            onclick="copyToClipboard(this)"
+                        <button data-url="{{ request.host_url }}{{ link.short_code }}" onclick="copyToClipboard(this)"
                             class="bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300 ml-2">
                             Copy
                         </button>
@@ -61,24 +60,23 @@
                     <!-- Original URL -->
                     <td class="border px-4 py-2 max-w-xs truncate">
                         <a href="{{ link.original_url }}" target="_blank"
-                           class="text-blue-600 hover:underline truncate">
+                            class="text-blue-600 hover:underline truncate">
                             {{ link.original_url }}
                         </a>
                     </td>
 
+                    <td class="border px-4 py-2 text-center">{{ user.email }}</td>
                     <td class="border px-4 py-2 text-center">{{ link.clicks }}</td>
 
                     <td class="border px-4 py-2 text-center flex justify-center gap-3">
                         <!-- EDIT BUTTON -->
-                        <button 
-                            onclick="editLink('{{ link.id }}', '{{ link.original_url }}')" 
+                        <button onclick="editLink('{{ link.id }}', '{{ link.original_url }}')"
                             class="text-blue-600 hover:text-blue-800 text-lg transition transform hover:scale-110">
                             <i class="fa-solid fa-pen"></i>
                         </button>
 
                         <!-- DELETE BUTTON -->
-                        <form action="{{ url_for('main.delete_link', id=link.id) }}" 
-                            method="POST"
+                        <form action="{{ url_for('main.delete_link', id=link.id) }}" method="POST"
                             onsubmit="return confirm('Delete this short link?');">
 
                             <button type="submit"
@@ -90,34 +88,31 @@
                     </td>
                 </tr>
                 {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
     </div>
-    {% elif selected_user_id %}
-        <p class="text-center text-gray-500 mt-6">No short links found for this user.</p>
-    {% endif %}
-
 </div>
 
 <script>
-function copyToClipboard(btn) {
-    const text = btn.getAttribute("data-url");
+    function copyToClipboard(btn) {
+        const text = btn.getAttribute("data-url");
 
-    navigator.clipboard.writeText(text)
-        .then(() => {
-            const original = btn.innerText;
-            btn.innerText = "Copied!";
-            btn.classList.add("bg-green-300");
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                const original = btn.innerText;
+                btn.innerText = "Copied!";
+                btn.classList.add("bg-green-300");
 
-            setTimeout(() => {
-                btn.innerText = original;
-                btn.classList.remove("bg-green-300");
-            }, 1500);
-        })
-        .catch(() => {
-            alert("Copy failed. Try HTTPS or localhost.");
-        });
-}
+                setTimeout(() => {
+                    btn.innerText = original;
+                    btn.classList.remove("bg-green-300");
+                }, 1500);
+            })
+            .catch(() => {
+                alert("Copy failed. Try HTTPS or localhost.");
+            });
+    }
 </script>
 
 {% endblock %}

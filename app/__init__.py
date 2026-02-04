@@ -33,6 +33,9 @@ def create_app():
     from app.controllers.routes import bp
     app.register_blueprint(bp)
 
+    from app.controllers.admin import admin
+    app.register_blueprint(admin)
+
     from app import models
     return app
 

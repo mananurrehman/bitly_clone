@@ -27,7 +27,7 @@ def login():
 
             # role based redirection
             if user.role == 'admin':
-                return redirect(url_for('main.admin_dashboard'))
+                return redirect(url_for('admin.admin_dashboard'))
             elif user.role == 'org_owner':
                 return redirect(url_for('main.org_dashboard'))
             else:

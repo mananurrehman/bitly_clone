@@ -18,6 +18,8 @@ The app supports **user authentication**, **short-link tracking**, and a **perso
     - Usman 
 - RBAC / ABAC
 - flask compress and minify 
+- middleware
+- regex 
 
 
 

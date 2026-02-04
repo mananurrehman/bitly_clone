@@ -1,22 +1,21 @@
-from flask import Blueprint, render_template, request, redirect, flash, url_for
+from flask import Blueprint, render_template, request, redirect, flash, url_for,abort
 from flask_login import login_required, current_user
 from app.models import Link, User
 import random
 import string
 from app import db
 
-bp = Blueprint('main', __name__)
+admin = Blueprint('admin', __name__, url_prefix='/admin')
 
-# Pool for available character like IPs in DHCP Pool
 CHAR_POOL = string.digits + string.ascii_lowercase + string.ascii_uppercase  # + ['-','_','+']
 
-# ===== Simple User DASHBOARD ROUTE ======
-@bp.route('/dashboard', methods=['GET', 'POST'])
+@admin.route('/', methods=['GET','POST'])
 @login_required
-def dashboard():
-    if current_user.role == 'admin':
-        return redirect(url_for('admin.admin_dashboard'))
-    
+def admin_dashboard():
+    if current_user.role != 'admin':
+        flash("Access denied", 'error')
+        return redirect(url_for('main.dashboard'))
+
     short_url = None
 
     if request.method == 'POST':
@@ -25,7 +24,7 @@ def dashboard():
 
         if not original_url:
             flash('URL is required', 'error')
-            return redirect(url_for('main.dashboard'))
+            return redirect(url_for('admin.admin_dashboard'))
 
         # ========= UPDATE MODE (ALREADY EXISTING) =========
         if edit_id:
@@ -37,12 +36,12 @@ def dashboard():
 
                 db.session.commit()
                 flash("Short link updated successfully!", "success")
-                return redirect(url_for('main.dashboard'))
+                return redirect(url_for('admin.admin_dashboard'))
 
             except Exception as e:
                 db.session.rollback()
                 flash("Error updating URL", "error")
-                return redirect(url_for('main.dashboard'))
+                return redirect(url_for('admin.admin_dashboard'))
 
         # ========= CREATE MODE (NEW) =========
 
@@ -71,12 +70,13 @@ def dashboard():
             )
 
             flash(f"Short link created: {short_url}", 'success')
-            return redirect(url_for('main.dashboard'))
+            return redirect(url_for('admin.admin_dashboard'))
 
         except Exception as e:
             db.session.rollback()
-            flash("Error saving URL", 'error')
-            return redirect(url_for('main.dashboard'))
+            print(e)
+            flash(f"Error saving URL {e}",'error')
+            return redirect(url_for('admin.admin_dashboard'))
 
     links = (
         Link.query
@@ -84,42 +84,33 @@ def dashboard():
         .order_by(Link.created_at.desc())
         .all()
     )
+    return render_template('admin_dashboard.html', links=links)
 
-    return render_template('dashboard.html', links=links)
-
-
-# ===> REDIRECT LOGIC - short_url (generated) <=====
-
-@bp.route('/<short_code>')
-def redirect_to_url(short_code):
-    # Search the database for this specific 1-char code
-    # .first() bcz 'short_code'=unique
-
-    link = Link.query.filter_by(short_code=short_code).first()
-
-    if link:
-        # if found, then redirect to original_orl
-        # Link.times_visited += 1
-        link.clicks +=1
-        db.session.commit()
-        return redirect(link.original_url)
-    
-    #if not, then don't exist
-    flash("Sorry, that short link doesn't exist!", "error")
-    return redirect('/')
-
-# ==> Deleting short url and free the 3 char phrase against it
-
-@bp.route('/delete/<int:id>', methods = ['POST'])
+# ====> ADMIN: VIEW ALL USERS & THEIR LINKS <==== 
+@admin.route('/users', methods=['GET'])
 @login_required
-def delete_link(id):
-    link = Link.query.get_or_404(id)
+def admin_user_links():
+    if current_user.role != 'admin':
+        flash('Access denied', 'error')
+        return redirect(url_for('main.dashboard'))
 
     try:
-        db.session.delete(link)
-        db.session.commit()
-        flash(f'Shrot URL Deleted & Short Code freed!', 'success')
-    except:
-        db.session.rollback()
-        flash(f'Unable to delete short url', 'error')
-    return redirect(url_for('main.dashboard'))
+        # Get user_id from query string and convert to int
+        select_user_id = request.args.get('user_id', type=int)
+        all_users = User.query.all()
+
+        # Query user by id if provided, else get all users
+        if select_user_id:
+            users = User.query.filter(User.id == select_user_id).all()
+        else:
+            users = all_users
+
+        return render_template(
+            'admin_user_links.html',
+            users=users,
+            all_users=all_users,
+            select_user_id=select_user_id
+        )
+    except Exception as e:
+        print(f"Error fetching users: {e}")
+        return abort(404)

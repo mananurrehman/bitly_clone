@@ -31,6 +31,10 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f'<User {self.email} - {self.role}>'
     
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
+    
     # Link Model based on datetime
 
 class Link(db.Model):
