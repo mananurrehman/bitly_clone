@@ -5,6 +5,22 @@ The app supports **user authentication**, **short-link tracking**, and a **perso
 
 ---
 
+## TODOs
+
+- pagination
+    - server based
+        - cursor based
+        - normal
+    - client based
+- super admin
+- admin (ORG) i.e CDA
+    - Haron
+    - Usman 
+- RBAC / ABAC
+- flask compress and minify 
+
+
+
 ## 🚀 Features
 
 - 🔐 User Authentication (Sign up / Login / Logout)

@@ -76,7 +76,7 @@
                             class="text-blue-600 hover:text-blue-800 text-lg transition transform hover:scale-110">
                             <i class="fa-solid fa-pen"></i>
                         </button>
-                        
+
                         <!-- DELETE BUTTON -->
                         <form action="{{ url_for('main.delete_link', id=link.id) }}" 
                             method="POST"
@@ -115,9 +115,7 @@ function copyToClipboard(btn) {
             alert("Copy failed. Try HTTPS or localhost.");
         });
 }
-</script>
 
-<script>
     const input = document.getElementById("urlInput");
     const btn = document.getElementById("submitBtn");
     const form = document.getElementById("shortenForm");

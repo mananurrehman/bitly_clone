@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, flash, url_for
 from flask_login import login_required, current_user
+from app.models import Link
 import random
 import string
 from app import db
@@ -7,13 +8,12 @@ from app import db
 bp = Blueprint('main', __name__)
 
 # Pool for available character like IPs in DHCP Pool
-CHAR_POOL = string.digits + string.ascii_lowercase + string.ascii_uppercase
+CHAR_POOL = string.digits + string.ascii_lowercase + string.ascii_uppercase  # + ['-','_','+']
 
 # ===== DASHBOARD ROUTE ======
 @bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    from app.models import Link
     short_url = None
 
     if request.method == 'POST':
@@ -89,7 +89,6 @@ def dashboard():
 
 @bp.route('/<short_code>')
 def redirect_to_url(short_code):
-    from app.models import Link
     # Search the database for this specific 1-char code
     # .first() bcz 'short_code'=unique
 
@@ -111,7 +110,6 @@ def redirect_to_url(short_code):
 @bp.route('/delete/<int:id>', methods = ['POST'])
 @login_required
 def delete_link(id):
-    from app.models import Link
     link = Link.query.get_or_404(id)
 
     try:
