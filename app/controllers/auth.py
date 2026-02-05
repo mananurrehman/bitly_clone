@@ -43,18 +43,30 @@ def login():
 @auth.route('/signup', methods = ['GET', 'POST'])
 def signup():
     if request.method == 'POST':
+        username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
 
-        if not email or not password:
+        if not username or not email or not password:
             flash('All fields are required', 'error')
             return(redirect(url_for('auth.signup')))
         
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered', 'error')
-            return(redirect(url_for('auth.signup')))
+        # Check if email OR username already exists
+        existing_user = User.query.filter(
+            (User.email == email) | (User.username == username)
+        ).first()
+
+        if existing_user:
+            if existing_user.email == email:
+                flash('Email already registered', 'error')
+            else:
+                flash('Username already taken', 'error')
+            return redirect(url_for('auth.signup'))
         
-        new_user = User(email=email)
+        new_user = User(
+            username=username,
+            email=email
+        )
         new_user.set_password(password)
 
         try:
@@ -65,7 +77,8 @@ def signup():
 
         except Exception as e:
             db.session.rollback()
-            logging.error(f"Failed to initialize database: {e}")
+            logging.error(f"Signup Failed: {e}")
+            flash("Something went wrong. Please try again.", 'error')
     
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))

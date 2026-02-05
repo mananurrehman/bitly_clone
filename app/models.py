@@ -15,7 +15,7 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # New columns
-    username = db.Column(db.String(50), nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
     total_links = db.Column(db.Integer, default=0)
     created_by_agency = db.Column(db.String(120), nullable=True)
 
