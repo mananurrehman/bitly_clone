@@ -17,14 +17,22 @@
           </a>
           
           {% if current_user.is_authenticated %}                
-              <div class="flex items-center gap-2"> 
-                  <!-- Profile Avatar with Dropdown -->
-                  <div class="relative">
-                      <!-- Avatar button -->
-                      <button id="profileBtn" class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-bold focus:outline-none hover:ring-2 hover:ring-blue-400">
-                          {{ current_user.email[0]|upper }}
-                      </button>
+                <div class="relative">
+                    <!-- Profile button (avatar + username) -->
+                    <button id="profileBtn"
+                        class="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none">
 
+                        <!-- Avatar circle -->
+                        <div class="flex items-center justify-center w-9 h-9 rounded-full bg-blue-600 text-white font-bold">
+                            {{ current_user.username[:1]|upper }}
+                        </div>
+
+                        <!-- Username -->
+                        <span class="font-medium text-gray-800 dark:text-gray-200">
+                            {{ current_user.username }}
+                        </span>
+                    </button>
+                    
                       <!-- Dropdown -->
                       <div id="profileDropdown" class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden z-50 dark:bg-gray-800 transition-all duration-200">
                           <div class="py-2 flex flex-col text-sm text-gray-700 dark:text-gray-200">

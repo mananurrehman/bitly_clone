@@ -2,7 +2,13 @@
 
 {% block content %}
 <div class="overflow-x-auto bg-white p-8 rounded-lg shadow-p-4">
-    <h2 class="text-2xl font-semibold mb-6 text-gray-700 text-center">URL Shortener Dashboard</h2>
+    <h2 class="text-2xl font-semibold mb-6 text-gray-700 text-center">
+        {% if is_admin %}
+            Admin URL Shortener Dashboard
+        {% else %}
+            URL Shortener Dashboard
+        {% endif %}
+    </h2>
 
     <!-- Shorten Form -->
     <form id="shortenForm"
@@ -16,7 +22,6 @@
             required
             placeholder="Paste your long URL"
             class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <!-- for updating entry -->
         <input type="hidden" id="editId" name="edit_id">
 
         <button id="submitBtn"
@@ -35,15 +40,15 @@
                     <th class="border px-4 py-2">Short URL</th>
                     <th class="border px-4 py-2">Original URL</th>
                     <th class="border px-4 py-2">Click Count</th>
-                    <th class="border px-4 py-2">Action</th> <!-- NEW -->
+                    <th class="border px-4 py-2">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for link in links %}
                 <tr class="hover:bg-gray-50">
-                    <td class="border px-4 py-2">{{ loop.index }}</td>
-
-                    <!-- Short URL with copy button -->
+                    <td class="border px-4 py-2">
+                        {{ start_index + loop.index }}
+                    </td>
                     <td class="border px-4 py-2 flex items-center justify-between min-w-[150px]">
                         <a href="{{ url_for('main.redirect_to_url', short_code=link.short_code) }}"
                            class="text-blue-600 hover:underline truncate flex-1"
@@ -57,44 +62,60 @@
                             Copy
                         </button>
                     </td>
-
-                    <!-- Original URL -->
                     <td class="border px-4 py-2 max-w-xs truncate">
                         <a href="{{ link.original_url }}" target="_blank"
                            class="text-blue-600 hover:underline truncate">
                             {{ link.original_url }}
                         </a>
                     </td>
-
                     <td class="border px-4 py-2 text-center">{{ link.clicks }}</td>
-
                     <td class="border px-4 py-2 text-center flex justify-center gap-3">
-
-                        <!-- EDIT BUTTON - Take link.id and link.original_url (both) -->
                         <button 
                             onclick="editLink('{{ link.id }}', '{{ link.original_url }}')" 
                             class="text-blue-600 hover:text-blue-800 text-lg transition transform hover:scale-110">
                             <i class="fa-solid fa-pen"></i>
                         </button>
-
-                        <!-- DELETE BUTTON -->
                         <form action="{{ url_for('main.delete_link', id=link.id) }}" 
                             method="POST"
                             onsubmit="return confirm('Delete this short link?');">
-
                             <button type="submit"
                                 class="text-red-600 hover:text-red-800 text-lg transition transform hover:scale-110">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </form>
-
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <!-- ===== Pagination Controls ===== -->
+        <div class="flex justify-between items-center mt-4 px-2">
+            <!-- Left: Showing X-Y of total -->
+            <div class="text-sm text-gray-600">
+                Showing {{ start_index }} - {{ end_index }} of {{ total_links }}
+            </div>
+
+            <!-- Right: Page Numbers -->
+            <div class="flex items-center gap-1 text-gray-700">
+                {% if page > 1 %}
+                    <a href="{{ url_for('main.dashboard', page=page-1) }}"
+                    class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">&lt;</a>
+                {% endif %}
+
+                {% for p in range(1, total_pages + 1) %}
+                    <a href="{{ url_for('main.dashboard', page=p) }}"
+                    class="px-2 py-1 rounded {{ 'bg-blue-600 text-white' if p==page else 'hover:bg-gray-200' }}">
+                    {{ p }}
+                    </a>
+                {% endfor %}
+
+                {% if page < total_pages %}
+                    <a href="{{ url_for('main.dashboard', page=page+1) }}"
+                    class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">&gt;</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
-</div>
 
 <script>
 function copyToClipboard(btn) {
@@ -116,43 +137,37 @@ function copyToClipboard(btn) {
         });
 }
 
-    const input = document.getElementById("urlInput");
-    const btn = document.getElementById("submitBtn");
-    const form = document.getElementById("shortenForm");
-    const editIdField = document.getElementById("editId");
+const input = document.getElementById("urlInput");
+const btn = document.getElementById("submitBtn");
+const form = document.getElementById("shortenForm");
+const editIdField = document.getElementById("editId");
 
-    // Switch back to shorten mode
-    function resetToShorten() {
-        btn.innerText = "Shorten!";
-        btn.classList.remove("bg-green-600", "hover:bg-green-700");
-        btn.classList.add("bg-blue-600", "hover:bg-blue-700");
-        editIdField.value = "";
-        form.onsubmit = null;
+function resetToShorten() {
+    btn.innerText = "Shorten!";
+    btn.classList.remove("bg-green-600", "hover:bg-green-700");
+    btn.classList.add("bg-blue-600", "hover:bg-blue-700");
+    editIdField.value = "";
+    form.onsubmit = null;
+}
+
+function editLink(id, originalUrl) {
+    input.value = originalUrl;
+    input.focus();
+    editIdField.value = id;
+
+    btn.innerText = "Update URL";
+    btn.classList.remove("bg-blue-600", "hover:bg-blue-700");
+    btn.classList.add("bg-green-600", "hover:bg-green-700");
+
+    form.onsubmit = function () {
+        return confirm("Update this original URL?");
+    };
+}
+
+input.addEventListener("input", function () {
+    if (input.value.trim() === "") {
+        resetToShorten();
     }
-
-    // Called when pen icon clicked
-    function editLink(id, originalUrl) {
-        input.value = originalUrl;
-        input.focus();
-
-        editIdField.value = id;
-
-        btn.innerText = "Update URL";
-        btn.classList.remove("bg-blue-600", "hover:bg-blue-700");
-        btn.classList.add("bg-green-600", "hover:bg-green-700");
-
-        form.onsubmit = function () {
-            return confirm("Update this original URL?");
-        };
-    }
-
-    // If input cleared → revert to shorten
-    input.addEventListener("input", function () {
-        if (input.value.trim() === "") {
-            resetToShorten();
-        }
-    });
+});
 </script>
-
-
 {% endblock %}
