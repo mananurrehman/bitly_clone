@@ -20,6 +20,7 @@ The app supports **user authentication**, **short-link tracking**, and a **perso
 - flask compress and minify 
 - middleware
 - regex 
+- sort by: (filter on table headers)
 
 
 
