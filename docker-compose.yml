@@ -1,0 +1,38 @@
+services:
+  app:
+    build: .
+    ports:
+      - "80:3000"
+    environment:
+      - SECRET_KEY=dev-secret-key-123
+      - DATABASE_URL=postgresql://bitly_user:123@db:5432/bitly_db
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - bitly_net
+    restart: always
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=bitly_user
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=bitly_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bitly_user -d bitly_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bitly_net
+    restart: always
+
+networks:
+  bitly_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
