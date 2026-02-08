@@ -78,13 +78,33 @@ def admin_dashboard():
             flash(f"Error saving URL {e}",'error')
             return redirect(url_for('admin.admin_dashboard'))
 
-    links = (
-        Link.query
-        .filter_by(user_id=current_user.id)
-        .order_by(Link.created_at.desc())
-        .all()
+    # ===== Normal Pagination =====
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+
+    # base query for current user's links
+    query = Link.query.filter_by(user_id=current_user.id).order_by(Link.created_at.desc(), Link.id.desc())
+
+    # paginate using SQLAlchemy
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    links = pagination.items
+
+    # calculate serial number start
+    start_index = (page - 1) * per_page + 1
+    end_index = start_index + len(links) - 1
+    total_links = pagination.total
+
+    return render_template(
+        "dashboard.html",
+        links=links,
+        is_admin = True,
+        page=page,
+        total_pages=pagination.pages,
+        start_index=start_index,
+        end_index=end_index,
+        total_links=total_links
     )
-    return render_template('admin_dashboard.html', links=links)
+
 
 # ====> ADMIN: VIEW ALL USERS & THEIR LINKS <==== 
 @admin.route('/users', methods=['GET'])

@@ -27,29 +27,22 @@ def dashboard():
             flash('URL is required', 'error')
             return redirect(url_for('main.dashboard'))
 
-        # ========= UPDATE MODE (ALREADY EXISTING) =========
+        # ========= UPDATE MODE =========
         if edit_id:
             try:
                 link = Link.query.get_or_404(edit_id)
-
                 link.original_url = original_url
-                link.clicks = 0   # reset clicks on update
-
+                link.clicks = 0  # reset clicks on update
                 db.session.commit()
                 flash("Short link updated successfully!", "success")
                 return redirect(url_for('main.dashboard'))
-
             except Exception as e:
                 db.session.rollback()
                 flash("Error updating URL", "error")
                 return redirect(url_for('main.dashboard'))
 
-        # ========= CREATE MODE (NEW) =========
-
-        # generate random short_code
+        # ========= CREATE MODE =========
         short_code = ''.join(random.choice(CHAR_POOL) for _ in range(3))
-
-        # ensure unique short_code
         while Link.query.filter_by(short_code=short_code).first():
             short_code = ''.join(random.choice(CHAR_POOL) for _ in range(3))
 
@@ -60,7 +53,6 @@ def dashboard():
                 user_id=current_user.id,
                 clicks=0
             )
-
             db.session.add(link)
             db.session.commit()
 
@@ -72,20 +64,38 @@ def dashboard():
 
             flash(f"Short link created: {short_url}", 'success')
             return redirect(url_for('main.dashboard'))
-
         except Exception as e:
             db.session.rollback()
             flash("Error saving URL", 'error')
             return redirect(url_for('main.dashboard'))
 
-    links = (
-        Link.query
-        .filter_by(user_id=current_user.id)
-        .order_by(Link.created_at.desc())
-        .all()
-    )
+    # ===== Normal Pagination =====
 
-    return render_template('dashboard.html', links=links)
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+
+    # base query for current user's links
+    query = Link.query.filter_by(user_id=current_user.id).order_by(Link.created_at.desc(), Link.id.desc())
+
+    # paginate using SQLAlchemy
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    links = pagination.items
+
+    # calculate serial number start
+    start_index = (page - 1) * per_page + 1
+    end_index = start_index + len(links) - 1
+    total_links = pagination.total
+
+    return render_template(
+        "dashboard.html",
+        links=links,
+        page=page,
+        total_pages=pagination.pages,
+        start_index=start_index,
+        end_index=end_index,
+        total_links=total_links
+    )
+    # return render_template('dashboard.html', links=links)
 
 
 # ===> REDIRECT LOGIC - short_url (generated) <=====

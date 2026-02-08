@@ -17,7 +17,7 @@
                 <option value="">Select user</option>
                 {% for user in all_users %}
                 <option value="{{ user.id }}" {% if select_user_id|int==user.id %} selected {% endif %}>
-                    {{ user.email }} ({{user.role}})
+                    {{ user.username }} ({{user.role}})
                 </option>
                 {% endfor %}
             </select>
@@ -43,7 +43,7 @@
 
                 {% for link in user.links %}
                 <tr class="hover:bg-gray-50">
-                    <td class="border px-4 py-2">{{ loop.index }}</td>
+                    <td class="border px-4 py-2">{{ link.id }}</td>
 
                     <!-- Short URL with copy button -->
                     <td class="border px-4 py-2 flex items-center justify-between min-w-[150px]">
@@ -65,7 +65,7 @@
                         </a>
                     </td>
 
-                    <td class="border px-4 py-2 text-center">{{ user.email }}</td>
+                    <td class="border px-4 py-2 text-center">{{ user.username }}</td>
                     <td class="border px-4 py-2 text-center">{{ link.clicks }}</td>
 
                     <td class="border px-4 py-2 text-center flex justify-center gap-3">

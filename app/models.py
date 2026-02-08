@@ -2,6 +2,7 @@ from app import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy import CheckConstraint
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -14,10 +15,17 @@ class User(db.Model, UserMixin):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # New columns
-    username = db.Column(db.String(50), nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
     total_links = db.Column(db.Integer, default=0)
     created_by_agency = db.Column(db.String(120), nullable=True)
+    
+    #additional fields for profile page
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=True) # Can be skipped
+    gender = db.Column(db.String(20), nullable=False)
+    age = db.Column(db.Integer, db.CheckConstraint('age > 0'), nullable=False)
+    profession = db.Column(db.String(100), nullable=False)     
+    bio = db.Column(db.String(250), nullable=True)    
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
