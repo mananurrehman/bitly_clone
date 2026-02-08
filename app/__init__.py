@@ -4,11 +4,14 @@ from flask_migrate import Migrate
 from config import Config
 import logging
 from flask_login import LoginManager
+import time
+from sqlalchemy.exc import OperationalError
 
 
 # instance created at module level 
 db = SQLAlchemy()
 migrate = Migrate()
+
 # login manager defined
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
@@ -21,9 +24,20 @@ def create_app():
     try:
         db.init_app(app)
         migrate.init_app(app, db)
+
         # initializing login manager for login sessions 
         login_manager.init_app(app)
-        
+
+        # AUTO-CREATE TABLES FOR FRESH DB (DOCKER / AWS SAFE)
+        from app import models
+        with app.app_context():
+            for _ in range(10):  # wait for DB to be ready
+                try:
+                    db.create_all()
+                    break
+                except OperationalError:
+                    time.sleep(1)
+
     except Exception as e:
         logging.error(f"Failed to initialize database: {e}")
 
@@ -36,7 +50,6 @@ def create_app():
     from app.controllers.admin import admin
     app.register_blueprint(admin)
 
-    from app import models
     return app
 
 
