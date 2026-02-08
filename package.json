@@ -1,0 +1,21 @@
+{
+  "name": "bitly_clone",
+  "version": "1.0.0",
+  "description": "A full-stack URL shortener web application inspired by Bitly, built using **Python, Flask, PostgreSQL, SQLAlchemy, Jinja2, and Tailwind CSS**.  \r The app supports **user authentication**, **short-link tracking**, and a **personal dashboard** to manage URLs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mananurrehman/bitly_clone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mananurrehman/bitly_clone/issues"
+  },
+  "homepage": "https://github.com/mananurrehman/bitly_clone#readme"
+}
