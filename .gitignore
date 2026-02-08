@@ -31,3 +31,6 @@ Thumbs.db
 
 #node modules 
 node_modules/
+
+# do NOT ignore setup scripts
+!vm_setup.sh
