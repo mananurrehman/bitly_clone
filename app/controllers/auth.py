@@ -52,6 +52,13 @@ def signup():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
+        # new fields added 
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        gender = request.form.get('gender')
+        age = request.form.get('age')
+        profession = request.form.get('profession')
+        bio = request.form.get('bio')
 
         if not username or not email or not password:
             flash('All fields are required', 'error')
@@ -71,7 +78,13 @@ def signup():
         
         new_user = User(
             username=username,
-            email=email
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            gender=gender,
+            age=int(age) if age else None, 
+            profession=profession,
+            bio=bio
         )
         new_user.set_password(password)
 
