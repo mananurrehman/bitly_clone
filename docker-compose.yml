@@ -2,7 +2,7 @@ services:
   app:
     build: .
     ports:
-      - "80:3000"
+      - "80:5000"
     environment:
       - SECRET_KEY=dev-secret-key-123
       - DATABASE_URL=postgresql://bitly_user:123@db:5432/bitly_db
