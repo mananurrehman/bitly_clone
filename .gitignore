@@ -1,12 +1,15 @@
 # Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
 
-#pycache from app
-app/__pycache__/
-*.pyc
-
-# Virtual environment
+# Virtual environments
 venv/
+env/
+.venv/
 
 # Environment variables
 .env
@@ -18,19 +21,29 @@ instance/
 # Migrations cache
 migrations/__pycache__/
 
-# OS files
-.DS_Store
-Thumbs.db
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
 # Logs
 *.log
 
+# Node modules
+node_modules/
+
+# Jenkins
+jenkins_home/
+
 # IDE / Editor
 .vscode/
 .idea/
+*.swp
+*.swo
 
-#node modules 
-node_modules/
+# OS files
+.DS_Store
+Thumbs.db
 
-# do NOT ignore setup scripts
+# Do NOT ignore setup scripts
 !vm_setup.sh
