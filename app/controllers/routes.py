@@ -133,3 +133,10 @@ def delete_link(id):
         db.session.rollback()
         flash(f'Unable to delete short url', 'error')
     return redirect(url_for('main.dashboard'))
+
+# ==> Profile Page <== 
+
+@bp.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', user=current_user)

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8">
+
+    <h2 class="text-3xl font-bold mb-6 text-center text-blue-600">
+        My Profile
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Username -->
+        <div>
+            <label class="text-sm text-gray-500">Username</label>
+            <p class="text-lg font-semibold">{{ user.username }}</p>
+        </div>
+
+        <!-- Email -->
+        <div>
+            <label class="text-sm text-gray-500">Email</label>
+            <p class="text-lg font-semibold">{{ user.email }}</p>
+        </div>
+
+        <!-- First Name -->
+        <div>
+            <label class="text-sm text-gray-500">First Name</label>
+            <p class="text-lg font-semibold">{{ user.first_name }}</p>
+        </div>
+
+        <!-- Last Name -->
+        <div>
+            <label class="text-sm text-gray-500">Last Name</label>
+            <p class="text-lg font-semibold">{{ user.last_name }}</p>
+        </div>
+
+        <!-- Gender -->
+        <div>
+            <label class="text-sm text-gray-500">Gender</label>
+            <p class="text-lg font-semibold">{{ user.gender }}</p>
+        </div>
+
+        <!-- Age -->
+        <div>
+            <label class="text-sm text-gray-500">Age</label>
+            <p class="text-lg font-semibold">{{ user.age }}</p>
+        </div>
+
+        <!-- Profession -->
+        <div>
+            <label class="text-sm text-gray-500">Profession</label>
+            <p class="text-lg font-semibold">{{ user.profession }}</p>
+        </div>
+
+    </div>
+
+    <!-- Bio Full Width -->
+    <div class="mt-6">
+        <label class="text-sm text-gray-500">Bio</label>
+        <p class="mt-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+            {{ user.bio }}
+        </p>
+    </div>
+
+</div>
+
+{% endblock %}
