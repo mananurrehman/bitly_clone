@@ -1,0 +1,45 @@
+services:
+  app-testuser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bitly-app-testuser
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      bitly-db-testuser:
+        condition: service_healthy
+    networks:
+      - bitly-network-testuser
+
+  bitly-db-testuser:
+    image: postgres:15
+    container_name: bitly-db-testuser
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - bitly_postgres_data_testuser:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bitly-network-testuser
+
+volumes:
+  bitly_postgres_data_testuser:
+    driver: local
+    name: bitly_postgres_data_testuser
+
+networks:
+  bitly-network-testuser:
+    driver: bridge
+    name: bitly-network-testuser
