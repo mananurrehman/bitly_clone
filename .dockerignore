@@ -1,0 +1,39 @@
+# .dockerignore
+# Git
+.git
+.gitignore
+
+# GitHub Actions
+.github
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+dist
+build
+
+# Virtual environment
+venv
+env
+.venv
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Docs
+README.md
+LICENSE
+*.md
+
+# OS files
+.DS_Store
+Thumbs.db
