@@ -1,24 +1,19 @@
-FROM python:3.11-slim
+# Stage 1: Build Stage (install dependencies)
+FROM python:3.11-alpine AS builder
 
 WORKDIR /app
 
-# Install system dependencies for psycopg2
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc libpq-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache-dir --prefix=/install -r requirements.txt
 
-# Copy requirements first (for Docker cache)
-COPY requirements.txt .
+# Stage 2: Final Stage (only runtime)
+FROM python:3.11-alpine
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR /app 
 
-# Copy project files
+COPY --from=builder /install /usr/local
+
 COPY . .
 
-# Expose port
 EXPOSE 5000
 
-# Run the app
 CMD ["python", "run.py"]
