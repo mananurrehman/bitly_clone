@@ -1,4 +1,4 @@
-# 🔗 Bitly Clone – URL Shortener with Authentication
+# 🔗 Bitly Clone – URL Shortener with Authentication 
 
 A full-stack URL shortener web application inspired by Bitly, built using **Python, Flask, PostgreSQL, SQLAlchemy, Jinja2, and Tailwind CSS**.  
 The app supports **user authentication**, **short-link tracking**, and a **personal dashboard** to manage URLs.
